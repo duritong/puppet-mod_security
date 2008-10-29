@@ -1,30 +1,47 @@
-#
-# mod_security module
-#
-# Copyright 2008, Puzzle ITC
-# Marcel Härry haerry+puppet(at)puzzle.ch
-# Simon Josi josi+puppet(at)puzzle.ch
-#
-# This program is free software; you can redistribute 
-# it and/or modify it under the terms of the GNU 
-# General Public License version 3 as published by 
-# the Free Software Foundation.
-#
-
-# modules_dir { \"mod_security\": }
+# modules/apache/manifests/modules/mod_security.pp
+# 2008 - admin(at)immerda.ch
+# License: GPLv3
 
 class mod_security {
-    include mod_security::base
+    case $operatingsystem {
+        gentoo: { include mod_security::gentoo }
+        default: { include mod_security::base }
+    }
 }
 
 class mod_security::base {
-    package{'mod_security':
-        ensure => present,
+    #mod_unique_id is needed for mod_security
+    include mod_unique_id
+
+    package{mod_security:
+        ensure => installed,
+        notify => Service[apache],
     }
-    service{mod_security:
-        ensure => running,
-        enable => true,
-        hasstatus => true,
+
+    file{custom_rules:
+        path => "/etc/apache2/modules.d/mod_security/Zcustom_rules/",
+        source => "puppet://$server/mod_security/custom_rules/",
+        recurse => true,
+        owner => root,
+        group => 0,
+        mode => 644,
         require => Package[mod_security],
+        notify => Service[apache],
     }
 }
+
+class mod_security::gentoo inherits mod_security::base {
+    Package[mod_security]{
+        category => 'www-apache',
+    }
+
+    file{"/etc/apache2/modules.d/99_mod_security.conf":
+        source => "puppet://$server/mod_security/configs/gentoo/99_mod_security.conf",
+        owner => root,
+        group => 0,
+        mode => 644,
+        require => Package[mod_security],
+        notify => Service[apache],
+    }
+}
+
