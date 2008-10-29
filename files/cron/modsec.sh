@@ -55,13 +55,17 @@ done
 # try restart
 if [ "$UPDATED" -gt "0" ]; then
 	echo -n "Restarting apache: "
-	$APACHEINITD restart
-	# did it work?
-	if `$APACHEINITD status`; then
-		echo "Apache restarted ok."
-		exit 0
-	fi
-	echo "error. Apache not running."
+	$APACHEINITD configtest 
+    $configtest=$?
+    if [ "$configtest" -eq "0" ]; then 
+       $APACHEINITD restart
+    	# did it work?
+	    if `$APACHEINITD status`; then
+		    echo "Apache restarted ok."
+    		exit 0
+	    fi
+	    echo "error. Apache not running."
+    fi
 
 	#roll back everything
 	for theRule in $listOfRules
@@ -72,15 +76,20 @@ if [ "$UPDATED" -gt "0" ]; then
 	echo "rolled back ok."
 	done
 	
-	# try starting httpd again
-	$APACHEINITD restart
+    $APACHEINITD configtest 
+    $configtest=$?
+    if [ "$configtest" -eq "0" ]; then
+	    # try starting httpd again
+    	$APACHEINITD restart
 	
-	# did that fix the problem?
-	if `$APACHEINITD status`; then
-		echo "That did the trick."
-		exit 0
-	fi
-
+    	# did that fix the problem?
+	    if `$APACHEINITD status`; then
+		    echo "That did the trick."
+    		exit 0
+	    fi
+    else
+        echo "Fatal: Apache configtest is till failing, Server needs attention!"
+    fi
 	echo "Fatal: Apache still not running! Run apachectl -t to find the error."
 	exit 999
 fi
