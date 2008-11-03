@@ -15,7 +15,7 @@ class mod_security::base {
     }
 
     file{'/etc/httpd/modsecurity.d/modsecurity_localrules.conf':
-        content => 'Include modsecurity.d/customrules/*.conf',
+        content => "Include modsecurity.d/customrules/*.conf\n",
         require => Package['mod_security'],
         owner => root, group => 0, mode => 0644;
     }
