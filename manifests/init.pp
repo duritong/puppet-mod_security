@@ -27,7 +27,7 @@ class mod_security::base {
     }
 
     file{'/etc/cron.d/modsec.sh':
-        source => "puppet://$server/mod_security/cron/modesc.sh",
+        source => "puppet://$server/mod_security/cron/modsec.sh",
         notify => Exec['update_modsec_rules'], 
         require => File['/etc/httpd/modsecurity.d/customrules'],
         owner => root, group => 0, mode => 0755;
