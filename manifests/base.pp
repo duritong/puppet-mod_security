@@ -1,5 +1,6 @@
 # very centos stylish at the moment
 class mod_security::base {
+    include apache
     package{'mod_security':
         ensure => installed,
         notify => Service[apache],
