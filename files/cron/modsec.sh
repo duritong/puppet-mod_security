@@ -24,7 +24,7 @@ MODSECPATH="/etc/httpd/modsecurity.d/customrules"
 PID=`cat ${APACHEPID}`
 UPDATED=0
 
-echo -n "Changing PWD: "
+#echo -n "Changing PWD: "
 cd ${MODSECPATH}
 echo `pwd`
 
@@ -38,30 +38,34 @@ baseUrl="http://www.gotroot.com/downloads/ftp/mod_security/2.0/apache2/"
 
 for theRule in $listOfRules
 do
-echo -n "Updating $theRule: "
+#echo -n "Updating $theRule: "
 /usr/bin/wget -t 30 -O ${theRule}.conf.1 -q ${baseUrl}${theRule}.conf
-if [ `md5sum ${theRule}.conf | cut -d " " -f1` != `md5sum ${theRule}.conf.1 | cut -d " " -f1` ] ; then
-
-	/bin/mv ${theRule}.conf ${theRule}.conf.bak
-	/bin/mv ${theRule}.conf.1 ${theRule}.conf
-	UPDATED=`expr $UPDATED + 1`
-	echo "ok."
+if [ ! -e ${theRule}.conf ]; then
+  mv ${theRule}.conf.1 ${theRule}.conf
 else
-	echo "allready up to date."
-	/bin/rm -f ${theRule}.conf.1
+  if [ `md5sum ${theRule}.conf | cut -d " " -f1` != `md5sum ${theRule}.conf.1 | cut -d " " -f1` ] ; then
+
+    /bin/mv ${theRule}.conf ${theRule}.conf.bak
+  	/bin/mv ${theRule}.conf.1 ${theRule}.conf
+	  UPDATED=`expr $UPDATED + 1`
+    #echo "ok."
+  else
+    #echo "allready up to date."
+    /bin/rm -f ${theRule}.conf.1
+  fi
 fi
 done
 
 # try restart
 if [ "$UPDATED" -gt "0" ]; then
-	echo -n "Restarting apache: "
+	#echo -n "Restarting apache: "
 	$APACHEINITD configtest 
     $configtest=$?
     if [ "$configtest" -eq "0" ]; then 
        $APACHEINITD restart
     	# did it work?
 	    if `$APACHEINITD status`; then
-		    echo "Apache restarted ok."
+		    #echo "Apache restarted ok."
     		exit 0
 	    fi
 	    echo "error. Apache not running."
