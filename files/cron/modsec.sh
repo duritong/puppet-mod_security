@@ -33,7 +33,7 @@ echo `pwd`
 # updated by Puzzle ITC
 
 
-listOfRules="00_asl_rbl.conf 20_asl_useragents.conf 60_asl_recons.conf domain-blacklist.txt malware-blacklist.txt 00_asl_whitelist.conf 30_asl_antimalware.conf 98_asl_jitp.conf domain-spam-whitelist.conf sql.txt 05_asl_exclude.conf 30_asl_antispam.conf 99_asl_exclude.conf domain-spam-whitelist.txt trusted-domains.conf 05_asl_scanner.conf 30_asl_antispam_referrer.conf 99_asl_jitp.conf malware-blacklist-high.txt trusted-domains.txt 10_asl_antimalware.conf 40_asl_apache2-rules.conf Zour_excludes.conf malware-blacklist-local.txt whitelist.txt 10_asl_rules.conf 50_asl_rootkits.conf domain-blacklist-local.txt malware-blacklist-low.txt"
+listOfRules="20_asl_useragents.conf 60_asl_recons.conf domain-blacklist.txt malware-blacklist.txt 30_asl_antimalware.conf 98_asl_jitp.conf sql.txt 05_asl_exclude.conf 99_asl_exclude.conf domain-spam-whitelist.txt 05_asl_scanner.conf 99_asl_jitp.conf malware-blacklist-high.txt trusted-domains.txt 10_asl_antimalware.conf 40_asl_apache2-rules.conf Zour_excludes.conf malware-blacklist-local.txt whitelist.txt 10_asl_rules.conf 50_asl_rootkits.conf domain-blacklist-local.txt malware-blacklist-low.txt"
 baseUrl="http://downloads.prometheus-group.com/delayed/rules/modsec/"
 
 for theRule in $listOfRules
