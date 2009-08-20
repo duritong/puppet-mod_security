@@ -33,25 +33,25 @@ echo `pwd`
 # updated by Puzzle ITC
 
 
-listOfRules="apache2-rules blacklist blacklist2 exclude jitp recons rootkits rules useragents"
-baseUrl="http://www.gotroot.com/downloads/ftp/mod_security/2.0/apache2/"
+listOfRules="00_asl_rbl.conf 20_asl_useragents.conf 60_asl_recons.conf domain-blacklist.txt malware-blacklist.txt 00_asl_whitelist.conf 30_asl_antimalware.conf 98_asl_jitp.conf domain-spam-whitelist.conf sql.txt 05_asl_exclude.conf 30_asl_antispam.conf 99_asl_exclude.conf domain-spam-whitelist.txt trusted-domains.conf 05_asl_scanner.conf 30_asl_antispam_referrer.conf 99_asl_jitp.conf malware-blacklist-high.txt trusted-domains.txt 10_asl_antimalware.conf 40_asl_apache2-rules.conf Zour_excludes.conf malware-blacklist-local.txt whitelist.txt 10_asl_rules.conf 50_asl_rootkits.conf domain-blacklist-local.txt malware-blacklist-low.txt"
+baseUrl="http://downloads.prometheus-group.com/delayed/rules/modsec/"
 
 for theRule in $listOfRules
 do
 #echo -n "Updating $theRule: "
-/usr/bin/wget -t 30 -O ${theRule}.conf.1 -q ${baseUrl}${theRule}.conf
-if [ ! -e ${theRule}.conf ]; then
-  mv ${theRule}.conf.1 ${theRule}.conf
+/usr/bin/wget -t 30 -O ${theRule}.1 -q ${baseUrl}${theRule}
+if [ ! -e ${theRule} ]; then
+  mv ${theRule}.1 ${theRule}
 else
-  if [ `md5sum ${theRule}.conf | cut -d " " -f1` != `md5sum ${theRule}.conf.1 | cut -d " " -f1` ] ; then
+  if [ `md5sum ${theRule} | cut -d " " -f1` != `md5sum ${theRule}.1 | cut -d " " -f1` ] ; then
 
-    /bin/mv ${theRule}.conf ${theRule}.conf.bak
-  	/bin/mv ${theRule}.conf.1 ${theRule}.conf
+    /bin/mv ${theRule} ${theRule}.bak
+  	/bin/mv ${theRule}.1 ${theRule}
 	  UPDATED=`expr $UPDATED + 1`
     #echo "ok."
   else
     #echo "allready up to date."
-    /bin/rm -f ${theRule}.conf.1
+    /bin/rm -f ${theRule}.1
   fi
 fi
 done
@@ -75,8 +75,8 @@ if [ "$UPDATED" -gt "0" ]; then
 	for theRule in $listOfRules
 	do
 	echo -n "Rolling back ${theRule}"
-	/bin/mv ${theRule}.conf ${theRule}.conf.new
-	/bin/mv ${theRule}.conf.bak ${theRule}.conf
+	/bin/mv ${theRule} ${theRule}.new
+	/bin/mv ${theRule}.bak ${theRule}
 	echo "rolled back ok."
 	done
 	
