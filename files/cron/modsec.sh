@@ -26,7 +26,7 @@ UPDATED=0
 
 #echo -n "Changing PWD: "
 cd ${MODSECPATH}
-echo `pwd`
+#echo `pwd`
 
 
 # generic by skyhorse
