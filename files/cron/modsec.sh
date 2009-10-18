@@ -14,6 +14,7 @@
 # URL: http://www.skyhorse.org/web-server-administration/auto-update-modsecurity-rules-modsecsh/ 
 
 APACHEINITD="/etc/init.d/httpd"
+APACHEPID="/var/run/httpd.pid"
 MODSECPATH="/etc/httpd/modsecurity.d/customrules"
 
 ##########################################################################
@@ -33,7 +34,7 @@ cd ${MODSECPATH}
 # updated by Puzzle ITC
 
 
-listOfRules="20_asl_useragents.conf 60_asl_recons.conf domain-blacklist.txt malware-blacklist.txt 30_asl_antimalware.conf 98_asl_jitp.conf sql.txt 05_asl_exclude.conf 99_asl_exclude.conf domain-spam-whitelist.txt 05_asl_scanner.conf 99_asl_jitp.conf malware-blacklist-high.txt trusted-domains.txt 10_asl_antimalware.conf 40_asl_apache2-rules.conf Zour_excludes.conf malware-blacklist-local.txt whitelist.txt 10_asl_rules.conf 50_asl_rootkits.conf domain-blacklist-local.txt malware-blacklist-low.txt"
+listOfRules="20_asl_useragents.conf 60_asl_recons.conf domain-blacklist.txt malware-blacklist.txt 30_asl_antimalware.conf 98_asl_jitp.conf sql.txt 05_asl_exclude.conf 99_asl_exclude.conf domain-spam-whitelist.txt 05_asl_scanner.conf 99_asl_jitp.conf malware-blacklist-high.txt trusted-domains.txt 10_asl_antimalware.conf 40_asl_apache2-rules.conf Zour_excludes.conf malware-blacklist-local.txt whitelist.txt 10_asl_rules.conf 50_asl_rootkits.conf domain-blacklist-local.txt malware-blacklist-low.txt sql.txt"
 baseUrl="http://downloads.prometheus-group.com/delayed/rules/modsec/"
 
 for theRule in $listOfRules
@@ -60,7 +61,7 @@ done
 if [ "$UPDATED" -gt "0" ]; then
 	#echo -n "Restarting apache: "
 	$APACHEINITD configtest 
-    $configtest=$?
+    configtest=$?
     if [ "$configtest" -eq "0" ]; then 
        $APACHEINITD restart
     	# did it work?
@@ -81,7 +82,7 @@ if [ "$UPDATED" -gt "0" ]; then
 	done
 	
     $APACHEINITD configtest 
-    $configtest=$?
+    configtest=$?
     if [ "$configtest" -eq "0" ]; then
 	    # try starting httpd again
     	$APACHEINITD restart
