@@ -19,13 +19,13 @@ class mod_security::base {
     }
 
     file{'/etc/cron.daily/modsec.sh':
-        source => "puppet://$server/mod_security/cron/modsec.sh",
+        source => "puppet://$server/modules/mod_security/cron/modsec.sh",
         notify => Exec['update_modsec_rules'],
         require => File['/etc/httpd/modsecurity.d/customrules'],
         owner => root, group => 0, mode => 0700;
     }
     file{'/etc/cron.daily/cleanup_modsec_logs.sh':
-        source => "puppet://$server/mod_security/cron/cleanup_modsec_logs.sh",
+        source => "puppet://$server/modules/mod_security/cron/cleanup_modsec_logs.sh",
         owner => root, group => 0, mode => 0700;
     }
         
