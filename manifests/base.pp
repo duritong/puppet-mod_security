@@ -1,37 +1,131 @@
-# very centos stylish at the moment
 class mod_security::base {
-    include apache
-    package{'mod_security':
-        ensure => installed,
-        notify => Service[apache],
+
+  include apache
+
+  package { 'mod_security':
+    alias   => 'mod_security',
+    ensure  => installed,
+    notify  => Service[apache],
+  }
+
+  $config_dir = $operatingsystem ? {
+    centos  => "${apache::centos::config_dir}/modsecurity.d",
+    debian  => "${apache::debian::config_dir}/modsecurity.d",
+    default => '/etc/apache2/conf.d',
+  }
+
+  file { 'mod_security_config_dir':
+    path    => $config_dir,
+    ensure  => directory,
+    owner   => 'root',
+    group   => 0,
+    mode    => '0755',
+  }
+
+  apache::config::file { 'mod_security.conf':
+    ensure  => present,
+    content => 'include modsecurity.d/*.conf',
+  }
+
+  # Use rule set from Atomic Secured Linux and update them every day
+  # See : http://www.gotroot.com/mod_security+rules
+
+  if ($mod_security_asl_ruleset == true) {
+
+    file { 'mod_security_asl_config_dir':
+      path    => "${config_dir}/asl",
+      ensure  => directory,
+      owner   => 'root',
+      group   => 0,
+      mode    => '0755',
     }
 
-    file{'/etc/httpd/modsecurity.d/modsecurity_localrules.conf':
-        content => "Include modsecurity.d/customrules/*.conf\n",
-        require => Package['mod_security'],
-        owner => root, group => 0, mode => 0644;
+    file { 'mod_security_asl_update_script':
+      ensure  => present,
+      path    => '/usr/local/bin/mod_security_asl_update.sh',
+      source  => [ "puppet://${server}/modules/site-mod_security/scripts/$operatingsystem/mod_security_asl_update.sh",
+                   "puppet://${server}/modules/site-mod_security/scripts/mod_security_asl_update.sh",
+                   "puppet://${server}/modules/mod_security/scripts/$operatingsystem/mod_security_asl_update.sh",
+                   "puppet://${server}/modules/mod_security/scripts/mod_security_asl_update.sh" ],
+      owner   => 'root',
+      group   => 0,
+      mode    => '0700',
     }
 
-    file{'/etc/httpd/modsecurity.d/customrules':
-        ensure => directory,
-        require => Package[mod_security],
-        owner => root, group => 0, mode => 0755;
+    exec { 'mod_security_asl_initialize':
+      command => '/usr/local/bin/mod_security_asl_update.sh',
+      creates => "${config_dir}/asl/sql.txt",
+      require => File[ [ 'mod_security_asl_config_dir', 'mod_security_asl_update_script' ] ],
     }
 
-    file{'/etc/cron.daily/modsec.sh':
-        source => "puppet://$server/modules/mod_security/cron/modsec.sh",
-        notify => Exec['update_modsec_rules'],
-        require => File['/etc/httpd/modsecurity.d/customrules'],
-        owner => root, group => 0, mode => 0700;
+    cron { 'mod_security_asl_update':
+      ensure  => present,
+      command => '/usr/local/bin/mod_security_asl_update.sh',
+      user    => 'root',
+      hour    => 3,
+      minute  => 39,
     }
-    file{'/etc/cron.daily/cleanup_modsec_logs.sh':
-        source => "puppet://$server/modules/mod_security/cron/cleanup_modsec_logs.sh",
-        owner => root, group => 0, mode => 0700;
+
+  }
+  else {
+
+    file { 'mod_security_asl_config_dir':
+      path    => "${config_dir}/asl",
+      ensure  => absent,
+      recurse => true,
+      force   => true,
     }
-        
-    exec{'update_modsec_rules':
-        command => '/etc/cron.daily/modsec.sh',
-        refreshonly => true,
+
+    file { 'mod_security_asl_update_script':
+      ensure  => absent,
+      path    => '/usr/local/bin/mod_security_asl_update.sh',
     }
+
+    cron { 'mod_security_asl_update':
+      ensure  => absent,
+      user    => root,
+    }
+
+  }
+
+  # Automatically clean vhost mod_security logs
+
+  if ($mod_security_logclean == true) {
+
+    file { 'mod_security_logclean_script':
+      ensure  => present,
+      path    => '/usr/local/bin/mod_security_logclean.sh',
+      source  => [ "puppet://${server}/modules/site-mod_security/scripts/$operatingsystem/mod_security_logclean.sh",
+                   "puppet://${server}/modules/site-mod_security/scripts/mod_security_logclean.sh",
+                   "puppet://${server}/modules/mod_security/scripts/$operatingsystem/mod_security_logclean.sh",
+                   "puppet://${server}/modules/mod_security/scripts/mod_security_logclean.sh" ],
+      owner   => 'root',
+      group   => 0,
+      mode    => '0700',
+    }
+
+    cron { 'mod_security_logclean':
+      ensure  => present,
+      command => '/usr/local/bin/mod_security_logclean.sh',
+      user    => 'root',
+      hour    => 3,
+      minute  => 23,
+    }
+
+  }
+  else {
+
+    file { 'mod_security_logclean_script':
+      ensure  => absent,
+      path    => '/usr/local/bin/mod_security_logclean.sh',
+    }
+
+    cron { 'mod_security_logclean':
+      ensure  => absent,
+      user    => root,
+    }
+
+  }
+
 }
 

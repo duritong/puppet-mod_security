@@ -15,7 +15,7 @@
 
 APACHEINITD="/etc/init.d/httpd"
 APACHEPID="/var/run/httpd.pid"
-MODSECPATH="/etc/httpd/modsecurity.d/customrules"
+MODSECPATH="/etc/httpd/modsecurity.d/asl"
 
 ##########################################################################
 ######### you probably don't need to change anything below here ##########
