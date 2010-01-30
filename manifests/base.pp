@@ -26,19 +26,28 @@ class mod_security::base {
   # See : http://www.gotroot.com/mod_security+rules
 
   apache::config::file { 'mod_security_asl.conf': }
+  file { 'mod_security_asl_config_dir':
+    path    => "${config_dir}/asl",
+  }
+  file { 'mod_security_asl_update_script':
+    path    => '/usr/local/bin/mod_security_asl_update.sh',
+    require => File['mod_security_asl_config_dir'],
+  }
+  cron { 'mod_security_asl_update':
+    command => '/usr/local/bin/mod_security_asl_update.sh',
+    require => File['mod_security_asl_update_script'],
+  }
   if ($mod_security_asl_ruleset == true) {
 
-    file { 'mod_security_asl_config_dir':
-      path    => "${config_dir}/asl",
+    File['mod_security_asl_config_dir']{
       ensure  => directory,
       owner   => 'root',
       group   => 0,
       mode    => '0755',
     }
 
-    file { 'mod_security_asl_update_script':
+    File['mod_security_asl_update_script']{
       ensure  => present,
-      path    => '/usr/local/bin/mod_security_asl_update.sh',
       source  => [ "puppet://${server}/modules/site-mod_security/scripts/$operatingsystem/mod_security_asl_update.sh",
                    "puppet://${server}/modules/site-mod_security/scripts/mod_security_asl_update.sh",
                    "puppet://${server}/modules/mod_security/scripts/$operatingsystem/mod_security_asl_update.sh",
@@ -51,13 +60,12 @@ class mod_security::base {
     exec { 'mod_security_asl_initialize':
       command => '/usr/local/bin/mod_security_asl_update.sh',
       creates => "${config_dir}/asl/sql.txt",
-      require => File[ [ 'mod_security_asl_config_dir', 'mod_security_asl_update_script' ] ],
+      require => File['mod_security_asl_update_script'],
     }
 
-    cron { 'mod_security_asl_update':
-      ensure  => present,
+    Cron['mod_security_asl_update']{
       command => '/usr/local/bin/mod_security_asl_update.sh',
-      user    => 'root',
+      ensure  => present,
       hour    => 3,
       minute  => 39,
     }
@@ -69,22 +77,19 @@ class mod_security::base {
 
   }
   else {
-
-    file { 'mod_security_asl_config_dir':
-      path    => "${config_dir}/asl",
+    File['mod_security_asl_config_dir']{
       ensure  => absent,
       recurse => true,
       force   => true,
+      purge   => true,
     }
 
-    file { 'mod_security_asl_update_script':
+    File['mod_security_asl_update_script']{
       ensure  => absent,
-      path    => '/usr/local/bin/mod_security_asl_update.sh',
     }
 
-    cron { 'mod_security_asl_update':
+    Cron['mod_security_asl_update']{
       ensure  => absent,
-      user    => root,
     }
     Apache::Config::File['mod_security_asl.conf']{
       ensure => absent,
@@ -93,11 +98,17 @@ class mod_security::base {
 
   # Automatically clean vhost mod_security logs
 
+  file{'mod_security_logclean_script':
+      path    => '/usr/local/bin/mod_security_logclean.sh',
+  }
+  cron{'mod_security_logclean':
+      user    => root,
+      require => File['mod_security_logclean_script'],
+  }
   if ($mod_security_logclean == true) {
 
-    file { 'mod_security_logclean_script':
+    File['mod_security_logclean_script']{
       ensure  => present,
-      path    => '/usr/local/bin/mod_security_logclean.sh',
       source  => [ "puppet://${server}/modules/site-mod_security/scripts/$operatingsystem/mod_security_logclean.sh",
                    "puppet://${server}/modules/site-mod_security/scripts/mod_security_logclean.sh",
                    "puppet://${server}/modules/mod_security/scripts/$operatingsystem/mod_security_logclean.sh",
@@ -107,10 +118,9 @@ class mod_security::base {
       mode    => '0700',
     }
 
-    cron { 'mod_security_logclean':
+    Cron['mod_security_logclean']{
       ensure  => present,
       command => '/usr/local/bin/mod_security_logclean.sh',
-      user    => 'root',
       hour    => 3,
       minute  => 23,
     }
@@ -118,14 +128,13 @@ class mod_security::base {
   }
   else {
 
-    file { 'mod_security_logclean_script':
+    File['mod_security_logclean_script']{
       ensure  => absent,
-      path    => '/usr/local/bin/mod_security_logclean.sh',
     }
 
-    cron { 'mod_security_logclean':
-      ensure  => absent,
+    Cron['mod_security_logclean']{
       user    => root,
+      ensure  => absent,
     }
 
   }
