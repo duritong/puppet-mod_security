@@ -22,14 +22,10 @@ class mod_security::base {
     mode    => '0755',
   }
 
-  apache::config::file { 'mod_security.conf':
-    ensure  => present,
-    content => 'include modsecurity.d/*.conf',
-  }
-
   # Use rule set from Atomic Secured Linux and update them every day
   # See : http://www.gotroot.com/mod_security+rules
 
+  apache::config::file { 'mod_security_asl.conf': }
   if ($mod_security_asl_ruleset == true) {
 
     file { 'mod_security_asl_config_dir':
@@ -66,6 +62,11 @@ class mod_security::base {
       minute  => 39,
     }
 
+    Apache::Config::File['mod_security_asl.conf']{
+      ensure  => present,
+      content => 'include modsecurity.d/asl/*.conf',
+    }
+
   }
   else {
 
@@ -85,7 +86,9 @@ class mod_security::base {
       ensure  => absent,
       user    => root,
     }
-
+    Apache::Config::File['mod_security_asl.conf']{
+      ensure => absent,
+    }
   }
 
   # Automatically clean vhost mod_security logs
