@@ -34,7 +34,7 @@ class mod_security::base {
     require => File['mod_security_asl_config_dir'],
   }
   cron { 'mod_security_asl_update':
-    command => '/usr/local/bin/mod_security_asl_update.sh',
+    user => 'root',
     require => File['mod_security_asl_update_script'],
   }
   if ($mod_security_asl_ruleset == true) {
