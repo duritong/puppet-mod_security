@@ -133,7 +133,6 @@ class mod_security::base {
     }
 
     Cron['mod_security_logclean']{
-      user    => root,
       ensure  => absent,
     }
 
