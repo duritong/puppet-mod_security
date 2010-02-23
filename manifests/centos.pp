@@ -9,4 +9,15 @@ class mod_security::centos inherits mod_security::base {
     notify => Service['apache'],
     owner => root, group => 0, mode => 0644;
   }
+
+  # since version 2.5 we need to define a SecDataDir
+  file{'/var/www/modsecurity_data':
+    ensure => directory,
+    owner => apache, group => apache, mode => 0640;
+  }
+  file{"${config_dir}/sec_data_dir.conf":
+    content => "SecDataDir /var/www/modsecurity_data\n",
+    require => File['/var/www/modsecurity_data'],
+    owner => root, group => 0, mode => 0644;
+  }
 }
