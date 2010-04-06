@@ -62,7 +62,8 @@ if [ "$UPDATED" -gt "0" ]; then
   configtest=$?
   if [ "$configtest" -eq "0" ]; then
     $APACHEINITD restart
-    # did it work?
+    # did it work? wait 2s to let the apache start
+    sleep 2
     $APACHEINITD status
     configtest=$?
     if [ "$configtest" -eq "0" ]; then
