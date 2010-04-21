@@ -14,6 +14,7 @@
 # URL: http://www.skyhorse.org/web-server-administration/auto-update-modsecurity-rules-modsecsh/
 
 APACHEINITD="/etc/init.d/apache2"
+APACHECTL="/usr/sbin/apache2ctl"
 APACHEPID="/var/run/apache2.pid"
 MODSECPATH="/etc/apache2/modsecurity.d/asl"
 
@@ -58,7 +59,7 @@ done
 # try restart
 if [ "$UPDATED" -gt "0" ]; then
   #echo -n "Restarting apache: "
-  $APACHEINITD configtest
+  $APACHECTL configtest
   configtest=$?
   if [ "$configtest" -eq "0" ]; then
     $APACHEINITD restart
@@ -81,7 +82,7 @@ if [ "$UPDATED" -gt "0" ]; then
     echo "rolled back ok."
   done
 
-  $APACHEINITD configtest
+  $APACHECTL configtest
   configtest=$?
   if [ "$configtest" -eq "0" ]; then
     # try starting httpd again
