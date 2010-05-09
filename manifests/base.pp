@@ -5,7 +5,8 @@ class mod_security::base {
   package { 'mod_security':
     alias   => 'mod_security',
     ensure  => installed,
-    notify  => Service[apache],
+    require => Package['apache'],
+    notify  => Service['apache'],
   }
 
   $config_dir = $operatingsystem ? {
@@ -17,9 +18,8 @@ class mod_security::base {
   file { 'mod_security_config_dir':
     path    => $config_dir,
     ensure  => directory,
-    owner   => 'root',
-    group   => 0,
-    mode    => '0755',
+    require => Package['mod_security'],
+    owner   => 'root', group => 0, mode => '0755';
   }
 
   # Use rule set from Atomic Secured Linux and update them every day
@@ -28,6 +28,7 @@ class mod_security::base {
   apache::config::file { 'mod_security_asl.conf': }
   file { 'mod_security_asl_config_dir':
     path    => "${config_dir}/asl",
+    require => Package['mod_security'],
   }
   file { 'mod_security_asl_update_script':
     path    => '/usr/local/bin/mod_security_asl_update.sh',
@@ -41,9 +42,7 @@ class mod_security::base {
 
     File['mod_security_asl_config_dir']{
       ensure  => directory,
-      owner   => 'root',
-      group   => 0,
-      mode    => '0755',
+      owner   => 'root', group => 0, mode => '0755',
     }
 
     File['mod_security_asl_update_script']{
@@ -68,6 +67,7 @@ class mod_security::base {
       ensure  => present,
       hour    => 3,
       minute  => 39,
+      require => File['mod_security_asl_update_script']
     }
 
     Apache::Config::File['mod_security_asl.conf']{
@@ -123,6 +123,7 @@ class mod_security::base {
       command => '/usr/local/bin/mod_security_logclean.sh',
       hour    => 3,
       minute  => 23,
+      require => File['mod_security_logclean_script']
     }
 
   }
