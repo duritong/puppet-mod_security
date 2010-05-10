@@ -1,5 +1,5 @@
-class mod_security::itk inherits mod_security {
+class mod_security::itk inherits mod_security::base {
   case $operatingsystem {
-    centos: { include mod_security::itk::centos }
+    default: { include mod_security::itk::base }
   }
 }
