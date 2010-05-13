@@ -67,7 +67,6 @@ class mod_security::base {
       ensure  => present,
       hour    => 3,
       minute  => 39,
-      require => File['mod_security_asl_update_script']
     }
 
     Apache::Config::File['mod_security_asl.conf']{
@@ -123,7 +122,6 @@ class mod_security::base {
       command => '/usr/local/bin/mod_security_logclean.sh',
       hour    => 3,
       minute  => 23,
-      require => File['mod_security_logclean_script']
     }
 
   }
