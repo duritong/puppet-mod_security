@@ -47,10 +47,10 @@ class mod_security::base {
 
     File['mod_security_asl_update_script']{
       ensure  => present,
-      source  => [ "puppet://${server}/modules/site-mod_security/scripts/$operatingsystem/mod_security_asl_update.sh",
-                   "puppet://${server}/modules/site-mod_security/scripts/mod_security_asl_update.sh",
-                   "puppet://${server}/modules/mod_security/scripts/$operatingsystem/mod_security_asl_update.sh",
-                   "puppet://${server}/modules/mod_security/scripts/mod_security_asl_update.sh" ],
+      source  => [ "puppet:///modules/site-mod_security/scripts/$operatingsystem/mod_security_asl_update.sh",
+                   "puppet:///modules/site-mod_security/scripts/mod_security_asl_update.sh",
+                   "puppet:///modules/mod_security/scripts/$operatingsystem/mod_security_asl_update.sh",
+                   "puppet:///modules/mod_security/scripts/mod_security_asl_update.sh" ],
       owner   => 'root',
       group   => 0,
       mode    => '0700',
@@ -108,10 +108,10 @@ class mod_security::base {
 
     File['mod_security_logclean_script']{
       ensure  => present,
-      source  => [ "puppet://${server}/modules/site-mod_security/scripts/$operatingsystem/mod_security_logclean.sh",
-                   "puppet://${server}/modules/site-mod_security/scripts/mod_security_logclean.sh",
-                   "puppet://${server}/modules/mod_security/scripts/$operatingsystem/mod_security_logclean.sh",
-                   "puppet://${server}/modules/mod_security/scripts/mod_security_logclean.sh" ],
+      source  => [ "puppet:///modules/site-mod_security/scripts/$operatingsystem/mod_security_logclean.sh",
+                   "puppet:///modules/site-mod_security/scripts/mod_security_logclean.sh",
+                   "puppet:///modules/mod_security/scripts/$operatingsystem/mod_security_logclean.sh",
+                   "puppet:///modules/mod_security/scripts/mod_security_logclean.sh" ],
       owner   => 'root',
       group   => 0,
       mode    => '0700',
