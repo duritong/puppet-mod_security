@@ -71,7 +71,7 @@ class mod_security::base {
 
     Apache::Config::File['mod_security_asl.conf']{
       ensure  => present,
-      content => 'include modsecurity.d/asl/*.conf',
+      content => "<IfModule mod_security2.c>\ninclude modsecurity.d/asl/*.conf\n</IfModule>",
     }
 
   }
