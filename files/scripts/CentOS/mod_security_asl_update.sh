@@ -39,19 +39,17 @@ baseUrl="http://downloads.prometheus-group.com/delayed/rules/modsec/"
 
 for theRule in $listOfRules ; do
   #echo -n "Updating $theRule: "
+  # ensure that theRule file is present
+  touch ${theRule}
   /usr/bin/wget -t 30 -O ${theRule}.1 -q ${baseUrl}${theRule}
-  if [ ! -e ${theRule} ]; then
-    mv ${theRule}.1 ${theRule}
+  if [ `md5sum ${theRule} | cut -d " " -f1` != `md5sum ${theRule}.1 | cut -d " " -f1` ] ; then
+    /bin/mv ${theRule} ${theRule}.bak
+    /bin/mv ${theRule}.1 ${theRule}
+    UPDATED=`expr $UPDATED + 1`
+    #echo "ok."
   else
-    if [ `md5sum ${theRule} | cut -d " " -f1` != `md5sum ${theRule}.1 | cut -d " " -f1` ] ; then
-      /bin/mv ${theRule} ${theRule}.bak
-      /bin/mv ${theRule}.1 ${theRule}
-      UPDATED=`expr $UPDATED + 1`
-      #echo "ok."
-    else
-      #echo "allready up to date."
-      /bin/rm -f ${theRule}.1
-    fi
+    #echo "allready up to date."
+    /bin/rm -f ${theRule}.1
   fi
 done
 
@@ -62,8 +60,8 @@ if [ "$UPDATED" -gt "0" ]; then
   configtest=$?
   if [ "$configtest" -eq "0" ]; then
     $APACHEINITD restart
-    # did it work? wait 2s to let the apache start
-    sleep 2
+    # did it work? wait 10s to let the apache start
+    sleep 10
     $APACHEINITD status
     configtest=$?
     if [ "$configtest" -eq "0" ]; then
@@ -86,6 +84,7 @@ if [ "$UPDATED" -gt "0" ]; then
   if [ "$configtest" -eq "0" ]; then
     # try starting httpd again
     $APACHEINITD restart
+    sleep 10
 
     # did that fix the problem?
     $APACHEINITD status
