@@ -12,9 +12,12 @@
 #
 # Copyleft 2006, SkyHorse.Org, No Rights Reserved
 # URL: http://www.skyhorse.org/web-server-administration/auto-update-modsecurity-rules-modsecsh/
+#
+# generic by skyhorse
+# updated by Puzzle ITC
+# improved by immerda.ch
 
 APACHEINITD="/etc/init.d/httpd"
-APACHEPID="/var/run/httpd.pid"
 MODSECPATH="/etc/httpd/modsecurity.d/asl"
 
 ##########################################################################
@@ -22,23 +25,13 @@ MODSECPATH="/etc/httpd/modsecurity.d/asl"
 ##########################################################################
 
 # internal
-PID=`cat ${APACHEPID}`
 UPDATED=0
-
-#echo -n "Changing PWD: "
 cd ${MODSECPATH}
-#echo `pwd`
-
-
-# generic by skyhorse
-# updated by Puzzle ITC
-
 
 listOfRules="20_asl_useragents.conf 60_asl_recons.conf domain-blacklist.txt malware-blacklist.txt 30_asl_antimalware.conf 98_asl_jitp.conf sql.txt 05_asl_exclude.conf 99_asl_exclude.conf domain-spam-whitelist.txt 05_asl_scanner.conf 99_asl_jitp.conf malware-blacklist-high.txt trusted-domains.txt 10_asl_antimalware.conf 40_asl_apache2-rules.conf Zour_excludes.conf malware-blacklist-local.txt whitelist.txt 10_asl_rules.conf 50_asl_rootkits.conf domain-blacklist-local.txt malware-blacklist-low.txt sql.txt"
 baseUrl="http://downloads.prometheus-group.com/delayed/rules/modsec/"
 
 for theRule in $listOfRules ; do
-  #echo -n "Updating $theRule: "
   # ensure that theRule file is present
   touch ${theRule}
   /usr/bin/wget -t 30 -O ${theRule}.1 -q ${baseUrl}${theRule}
@@ -46,31 +39,23 @@ for theRule in $listOfRules ; do
     /bin/mv ${theRule} ${theRule}.bak
     /bin/mv ${theRule}.1 ${theRule}
     UPDATED=`expr $UPDATED + 1`
-    #echo "ok."
   else
-    #echo "allready up to date."
     /bin/rm -f ${theRule}.1
   fi
 done
 
-# try restart
 if [ "$UPDATED" -gt "0" ]; then
-  #echo -n "Restarting apache: "
+  # check config before reloading
   $APACHEINITD configtest
-  configtest=$?
-  if [ "$configtest" -eq "0" ]; then
-    $APACHEINITD restart
-    # did it work? wait 10s to let the apache start
-    sleep 10
+  if [ $? -eq 0 ]; then
+    $APACHEINITD reload
     $APACHEINITD status
-    configtest=$?
-    if [ "$configtest" -eq "0" ]; then
-      #echo "Apache restarted ok."
+    if [ $? -eq 0 ]; then
       exit 0
     fi
-    echo "error. Apache not running."
   fi
 
+  echo "error. Configtest failed"
   #roll back everything
   for theRule in $listOfRules ; do
     echo -n "Rolling back ${theRule}"
@@ -80,22 +65,21 @@ if [ "$UPDATED" -gt "0" ]; then
   done
 
   $APACHEINITD configtest
-  configtest=$?
-  if [ "$configtest" -eq "0" ]; then
+  if [ $? -eq 0 ]; then
     # try starting httpd again
-    $APACHEINITD restart
-    sleep 10
+    $APACHEINITD reload
 
     # did that fix the problem?
     $APACHEINITD status
-    configtest=$?
-    if [ "$configtest" -eq "0" ]; then
+    if [ $? -eq 0 ]; then
       echo "That did the trick."
-      exit 0
+      # still non zero exitcode as we can't update
+      exit 1
+    else
+      echo "Fatal: Apache server is not running. Server needs attention!"
     fi
   else
-    echo "Fatal: Apache configtest is till failing, Server needs attention!"
+    echo "Fatal: Apache configtest is still failing, Server needs attention!"
   fi
-  echo "Fatal: Apache still not running! Run $APACHEINITD configtest to find the error."
   exit 999
 fi
