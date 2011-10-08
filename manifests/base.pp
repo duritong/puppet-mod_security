@@ -59,7 +59,7 @@ class mod_security::base {
     exec { 'mod_security_asl_initialize':
       command => '/usr/local/bin/mod_security_asl_update.sh',
       creates => "${config_dir}/asl/sql.txt",
-      require => File['mod_security_asl_update_script'],
+      require => [ File['mod_security_asl_update_script'], Service['apache'] ]
     }
 
     Cron['mod_security_asl_update']{
