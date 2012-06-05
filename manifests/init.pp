@@ -4,7 +4,7 @@
 # License: GPLv3
 
 class mod_security {
-  case $operatingsystem {
+  case $::operatingsystem {
     centos: { include mod_security::centos }
     debian: { include mod_security::debian }
     default: { include mod_security::base }

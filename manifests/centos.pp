@@ -1,6 +1,6 @@
 class mod_security::centos inherits mod_security::base {
   apache::config::global{'mod_security.conf':
-    source => "modules/mod_security/normal/${operatingsystem}/mod_security.conf",
+    source => "modules/mod_security/normal/${::operatingsystem}/mod_security.conf",
     require => Package['mod_security'],
     notify => Service['apache'],
   }

@@ -9,7 +9,7 @@ class mod_security::base {
     notify  => Service['apache'],
   }
 
-  $config_dir = $operatingsystem ? {
+  $config_dir = $::operatingsystem ? {
     centos  => "${apache::centos::config_dir}/modsecurity.d",
     debian  => "${apache::debian::config_dir}/modsecurity.d",
     default => '/etc/apache2/conf.d',
@@ -47,9 +47,9 @@ class mod_security::base {
 
     File['mod_security_asl_update_script']{
       ensure  => present,
-      source  => [ "puppet:///modules/site-mod_security/scripts/$operatingsystem/mod_security_asl_update.sh",
-                   "puppet:///modules/site-mod_security/scripts/mod_security_asl_update.sh",
-                   "puppet:///modules/mod_security/scripts/$operatingsystem/mod_security_asl_update.sh",
+      source  => [ "puppet:///modules/site_mod_security/scripts/${::operatingsystem}/mod_security_asl_update.sh",
+                   "puppet:///modules/site_mod_security/scripts/mod_security_asl_update.sh",
+                   "puppet:///modules/mod_security/scripts/${::operatingsystem}/mod_security_asl_update.sh",
                    "puppet:///modules/mod_security/scripts/mod_security_asl_update.sh" ],
       owner   => 'root',
       group   => 0,
@@ -108,9 +108,9 @@ class mod_security::base {
 
     File['mod_security_logclean_script']{
       ensure  => present,
-      source  => [ "puppet:///modules/site-mod_security/scripts/$operatingsystem/mod_security_logclean.sh",
-                   "puppet:///modules/site-mod_security/scripts/mod_security_logclean.sh",
-                   "puppet:///modules/mod_security/scripts/$operatingsystem/mod_security_logclean.sh",
+      source  => [ "puppet:///modules/site_mod_security/scripts/${::operatingsystem}/mod_security_logclean.sh",
+                   "puppet:///modules/site_mod_security/scripts/mod_security_logclean.sh",
+                   "puppet:///modules/mod_security/scripts/${::operatingsystem}/mod_security_logclean.sh",
                    "puppet:///modules/mod_security/scripts/mod_security_logclean.sh" ],
       owner   => 'root',
       group   => 0,
