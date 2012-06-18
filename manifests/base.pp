@@ -38,7 +38,7 @@ class mod_security::base {
     user => 'root',
     require => File['mod_security_asl_update_script'],
   }
-  if ($mod_security::asl_ruleset == true) {
+  if $mod_security::asl_ruleset {
 
     File['mod_security_asl_config_dir']{
       ensure  => directory,
@@ -104,7 +104,7 @@ class mod_security::base {
       user    => root,
       require => File['mod_security_logclean_script'],
   }
-  if ($mod_security::logclean == true) {
+  if $mod_security::log_clean {
 
     File['mod_security_logclean_script']{
       ensure  => present,
