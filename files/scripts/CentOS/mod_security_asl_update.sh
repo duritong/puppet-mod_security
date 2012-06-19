@@ -30,6 +30,8 @@ cd ${MODSECPATH}
 
 listOfRules="20_asl_useragents.conf 60_asl_recons.conf domain-blacklist.txt malware-blacklist.txt 30_asl_antimalware.conf 98_asl_jitp.conf sql.txt 05_asl_exclude.conf 99_asl_exclude.conf domain-spam-whitelist.txt 05_asl_scanner.conf 99_asl_jitp.conf malware-blacklist-high.txt trusted-domains.txt 10_asl_antimalware.conf 40_asl_apache2-rules.conf Zour_excludes.conf malware-blacklist-local.txt whitelist.txt 10_asl_rules.conf 50_asl_rootkits.conf domain-blacklist-local.txt malware-blacklist-low.txt sql.txt"
 baseUrl="http://downloads.prometheus-group.com/delayed/rules/modsec/"
+# TODO: introduce that url
+#baseUrl="http://updates.atomicorp.com/channels/rules/delayed/modsec/"
 
 for theRule in $listOfRules ; do
   # ensure that theRule file is present
