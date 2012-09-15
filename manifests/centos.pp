@@ -16,7 +16,7 @@ class mod_security::centos inherits mod_security::base {
   }
 
   package{'mod_security_crs': }
-  if mod_security::crs_ruleset {
+  if $mod_security::crs_ruleset {
     Package['mod_security_crs']{
       ensure => present,
     }
@@ -27,7 +27,7 @@ class mod_security::centos inherits mod_security::base {
   }
 
   package{'mod_security_crs-extras': }
-  if mod_security::crs_extras_ruleset {
+  if $mod_security::crs_extras_ruleset {
     Package['mod_security_crs-extras']{
       ensure => present,
     }
