@@ -2,6 +2,7 @@ class mod_security::centos inherits mod_security::base {
   apache::config::global{'mod_security.conf':
     source  => [  "puppet:///modules/site_mod_security/normal/${::fqdn}/mod_security.conf",
                   "puppet:///modules/site_mod_security/normal/${::domain}/mod_security.conf",
+                  "puppet:///modules/site_mod_security/normal/${::operatingsystem}/mod_security.conf",
                   "puppet:///modules/site_mod_security/normal/mod_security.conf",
                   "puppet:///modules/mod_security/normal/${::operatingsystem}/mod_security.conf" ],
     require => Package['mod_security'],
