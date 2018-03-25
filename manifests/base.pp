@@ -18,10 +18,10 @@ class mod_security::base {
 
   # Automatically clean vhost mod_security logs
   file{'/usr/local/sbin/mod_security_logclean.sh':
-    source  => "puppet:///modules/mod_security/scripts/mod_security_logclean.sh",
-    owner   => 'root',
-    group   => 0,
-    mode    => '0700',
+    source => 'puppet:///modules/mod_security/scripts/mod_security_logclean.sh',
+    owner  => 'root',
+    group  => 0,
+    mode   => '0700',
   }
   file{'/etc/cron.daily/mod_security_logclean.sh': }
   if $mod_security::log_clean_days_to_keep {
