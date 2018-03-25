@@ -17,7 +17,7 @@ class mod_security::base {
   }
 
   # Automatically clean vhost mod_security logs
-  file{'/usr/local/bin/mod_security_logclean.sh':
+  file{'/usr/local/sbin/mod_security_logclean.sh':
     source  => "puppet:///modules/mod_security/scripts/mod_security_logclean.sh",
     owner   => 'root',
     group   => 0,
@@ -26,7 +26,10 @@ class mod_security::base {
   file{'/etc/cron.daily/mod_security_logclean.sh': }
   if $mod_security::log_clean_days_to_keep {
     File['/etc/cron.daily/mod_security_logclean.sh']{
-      content  => "#!/bin/bash\n/usr/local/bin/mod_security_logclean.sh ${mod_security::log_clean_days_to_keep}\n",
+      owner    => 'root',
+      group    => 0,
+      mode     => '0700',
+      content  => "#!/bin/bash\n/usr/local/sbin/mod_security_logclean.sh ${mod_security::log_clean_days_to_keep}\n",
     }
   } else {
     File['/etc/cron.daily/mod_security_logclean.sh']{
