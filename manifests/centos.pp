@@ -1,6 +1,6 @@
 # centos specific things
 class mod_security::centos inherits mod_security::base {
-  if versioncmp($acts['os']['release']['major'],'7') < 0 {
+  if versioncmp($facts['os']['release']['major'],'7') < 0 {
     apache::config::global{'mod_security.conf':
       source  => [  "puppet:///modules/site_mod_security/normal/${::fqdn}/mod_security.conf",
                     "puppet:///modules/site_mod_security/normal/${::domain}/mod_security.conf",
